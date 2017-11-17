@@ -1,0 +1,31 @@
+{
+  "name": "quickshuffle",
+  "version": "0.1.0",
+  "private": true,
+  "devDependencies": {
+    "react-native-scripts": "1.7.0",
+    "jest-expo": "^22.0.0",
+    "react-test-renderer": "16.0.0-beta.5"
+  },
+  "main": "./node_modules/react-native-scripts/build/bin/crna-entry.js",
+  "scripts": {
+    "start": "react-native-scripts start",
+    "eject": "react-native-scripts eject",
+    "android": "react-native-scripts android",
+    "ios": "react-native-scripts ios",
+    "test": "node node_modules/jest/bin/jest.js --watch"
+  },
+  "jest": {
+    "preset": "jest-expo"
+  },
+  "dependencies": {
+    "axios": "^0.17.1",
+    "expo": "^22.0.2",
+    "query-string": "^5.0.1",
+    "react": "16.0.0-beta.5",
+    "react-native": "https://github.com/expo/react-native/archive/sdk-22.0.2.tar.gz",
+    "react-native-extended-stylesheet": "^0.8.0",
+    "react-native-webview-bridge": "^0.33.0",
+    "react-native-webview-invoke": "^0.3.10"
+  }
+}
