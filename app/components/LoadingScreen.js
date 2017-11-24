@@ -8,6 +8,6 @@ const LoadingScreen = () => (
             size="large"
         />
     </View>
-)
+);
 
 export default LoadingScreen;

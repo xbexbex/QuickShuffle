@@ -1,10 +1,10 @@
-import EStyleSheet from 'react-native-extended-stylesheet'
+import EStyleSheet from 'react-native-extended-stylesheet';
 
 const styles = EStyleSheet.create({
     root: {
         flex: 1,
         justifyContent: 'center',
-        backgroundColor: '$white',
+        backgroundColor: '$black',
         alignItems: 'center'
     },
 
@@ -23,7 +23,11 @@ const styles = EStyleSheet.create({
     },
 
     webView: {
-        marginTop: '15%'
+        flex: 1
+    },
+
+    keyboardView: {
+        flex: 1
     }
 });
 

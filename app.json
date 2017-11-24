@@ -1,5 +1,14 @@
 {
   "expo": {
-    "sdkVersion": "22.0.0"
+    "sdkVersion": "22.0.0",
+    "icon": "./app/assets/images/icon.png",
+    "orientation": "portrait",
+    "loading": {
+      "icon": "./app/assets/images/icon.png",
+      "hideExponentText": false
+    },
+    "ios": {
+      "supportsTablet": true
+    }
   }
 }

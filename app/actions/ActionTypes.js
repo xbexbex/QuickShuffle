@@ -1,0 +1,9 @@
+export const PLAYLISTS_PENDING = 'playlists_pending';
+export const PLAYLISTS_ERROR = 'playlists_error';
+export const PLAYLISTS_SUCCESS = 'playlists_success';
+export const USER_RESPONSE_PENDING = 'user_response_pending';
+export const USER_RESPONSE_ERROR = 'user_response_error';
+export const ACCESS_TOKEN_SUCCESS = 'access_token_success';
+export const USER_ID_SUCCESS = 'user_id_success';
+export const TOKENS_SUCCESS = 'tokens_success';
+export const SET_AUTH_CODE = 'set_auth_code';
