@@ -17,12 +17,12 @@ export function callUserService() {
     return dispatch => {
         dispatch(userResponsePending());
         axios.get('https://jsonplaceholder.typicode.com/posts')
-            .then(response => {
-                dispatch(refreshTokenSuccess(response.data));
-            })
-            .catch(error => {
-                dispatch(userResponseError(error));
-            });
+        .then(response => {
+            dispatch(refreshTokenSuccess(response.data));
+        })
+        .catch(error => {
+            dispatch(userResponseError(error));
+        });
     };
 }
 
@@ -33,17 +33,16 @@ export function getAccessToken(refreshToken) {
             grant_type: 'refresh_token',
             refresh_token: refreshToken
         }, axiosConfig)
-            .then(response => {
-                dispatch(accessTokenSuccess(response.data));
-            })
-            .catch(error => {
-                dispatch(userResponseError(error));
-            });
+        .then(response => {
+            dispatch(accessTokenSuccess(response.data));
+        })
+        .catch(error => {
+            dispatch(userResponseError(error));
+        });
     };
 }
 
 export function getTokens(authCode) {
-    console.log('asdfasdf');
     return dispatch => {
         if (!authCode) {
             return dispatch(userResponseError('Authentication unsuccessful'));
@@ -56,12 +55,12 @@ export function getTokens(authCode) {
             code: authCode,
             redirect_uri: redirectUri
         }), axiosConfig)
-            .then(response => {
-                dispatch(tokensSuccess(response.data));
-            })
-            .catch(error => {
-                dispatch(userResponseError(error, 'tokensError'));
-            });
+        .then(response => {
+            dispatch(tokensSuccess(response.data));
+        })
+        .catch(error => {
+            dispatch(userResponseError(error, 'tokensError'));
+        });
     };
 }
 
