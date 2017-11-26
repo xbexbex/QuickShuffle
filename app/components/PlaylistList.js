@@ -5,23 +5,30 @@ import { PlaylistItem } from './PlaylistItem';
 import styles from './styles/PlaylistList';
 import configureStore from '../store';
 import { getPlaylists } from '../actions/PlaylistsActions';
+import { LoadingScreen } from '../components/LoadingScreen';
 
-const { store } = configureStore();
+function mapStateToProps(state) {
+    return {
+        accessToken: state.userReducer.accessToken,
+        refreshToken: state.userReducer.refreshToken,
+        error: state.userReducer.userError,
+        authState: state.userReducer.authState,
+        playlists: state.playlistsReducer.playlists,
+        selectedPlaylists: state.playlistsReducer.selectedPlaylists
+    };
+}
 
 class PlaylistList extends Component {
 
     constructor(props) {
         super(props);
         this.state = {
-            abua: 'babua'
+            viewState: 'loading'
         };
     }
 
     componentDidMount() {
-        const { dispatch } = this.props;
-        console.log('abua');
-        console.log(this.props.data);
-        console.log(this.props.error);
+        getPlaylists(this.props.accessToken);
     }
 
     componentWillReceiveProps(nextProps) {
@@ -33,18 +40,23 @@ class PlaylistList extends Component {
     }
 
     render() {
+        if (this.state.viewState === 'loading') {
+            return (
+                <LoadingScreen />
+            );
+        }
         return (
-            <Text>Abua</Text>
-        );
+            <View>
+                {
+                    this.props.playlists.map((playlist) => {
+                        return (<PlaylistItem 
+                            playlist={playlist}>
+                        </PlaylistItem>);
+                    })
+                }
+            </View>
+        )
     }
-}
-
-function mapStateToProps(state) {
-    return {
-        isLoading: state.playlistsLoading,
-        error: state.playlistsError,
-        data: state.playlistsData
-    };
 }
 
 export default connect(mapStateToProps)(PlaylistList);

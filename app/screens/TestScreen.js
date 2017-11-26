@@ -11,7 +11,13 @@ import { STATUS_BAR_HEIGHT } from '../constants';
 import { getTokens } from '../actions/UserActions';
 
 function mapStateToProps(state) {
-    return { authCode: state.userReducer.authCode, accessToken: state.userReducer.accessToken, refreshToken: state.userReducer.refreshToken, error: state.userReducer.userError, authState: state.userReducer.authState };
+    return {
+        authCode: state.userReducer.authCode,
+        accessToken: state.userReducer.accessToken, 
+        refreshToken: state.userReducer.refreshToken, 
+        error: state.userReducer.userError, 
+        authState: state.userReducer.authState
+    };
 }
 
 class TestScreen extends Component {
@@ -20,8 +26,8 @@ class TestScreen extends Component {
         title: 'Playlists',
         headerStyle: {
             height: Platform.OS === 'android'
-                ? 200 + STATUS_BAR_HEIGHT
-                : 200,
+                ? 54 + STATUS_BAR_HEIGHT
+                : 54,
             backgroundColor: 'green'
         },
         headerTitleStyle: {
