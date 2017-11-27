@@ -2,7 +2,7 @@ import * as Actions from '../actions/ActionTypes';
 
 const INITIAL_STATE = {
     isLoading: true,
-    data: {},
+    playlists: {},
     error: undefined
 };
 
@@ -20,7 +20,7 @@ const playlistsReducer = (state = INITIAL_STATE, action) => {
         case Actions.PLAYLISTS_SUCCESS:
             return Object.assign({}, state, {
                 playlistsLoading: false,
-                data: action.data[1]
+                playlists: action.playlists
             });
         default:
             return state;

@@ -1,15 +1,24 @@
-import { connect } from 'react-redux';
-import axios from 'react-native-axios';
+import axios from 'axios';
 import * as ActionTypes from './ActionTypes';
 
-export function getPlaylists(accessToken) {
+axios.defaults.baseURL = 'https://api.spotify.com/v1';
+
+
+export function getPlaylists(accessToken, userId) {
     return dispatch => {
+        const bear = 'Bearer ' + accessToken;
+        const axConfig = {
+            headers: { 'Authorization': bear }
+        };
         dispatch(playlistsActionPending());
-        axios.get('https://jsonplaceholder.typicode.com/posts')
+        const url = '/users/' + userId + '/playlists';
+        return axios.get(url, axConfig)
             .then(response => {
-                dispatch(playlistsActionSuccess(response.data));
+                console.log(response);
+                dispatch(playlistsActionSuccess(response.data.items));
             })
             .catch(error => {
+                console.log(error.response);
                 dispatch(playlistsActionError(error));
             });
     };
@@ -26,6 +35,6 @@ export const playlistsActionError = (error) => ({
 
 export const playlistsActionSuccess = (data) => ({
     type: ActionTypes.PLAYLISTS_SUCCESS,
-    playlistsData: data
+    playlists: data
 });
 

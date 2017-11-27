@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
-import { PropTypes } from 'prop-types';
 import { connect } from 'react-redux';
+import { PropTypes } from 'prop-types';
 import { View, Text } from 'react-native';
 import styles from './styles/PlaylistList';
 
@@ -10,10 +10,10 @@ class PlaylistItem extends Component {
     }
 
     render() {
-        const { playlist, playlist: { title } } = this.props;
+        const { playlist, playlist: { id } } = this.props;
         return (
             <View style={styles.playlistItem}>
-                <Text>{title}</Text>
+                <Text>{id}</Text>
             </View>
         );
     }

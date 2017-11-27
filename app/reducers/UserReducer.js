@@ -2,12 +2,12 @@ import * as Actions from '../actions/ActionTypes';
 
 const INITIAL_STATE = {
     isLoading: true,
-    refreshToken: undefined,
-    accessToken: undefined,
-    userId: undefined,
-    error: undefined,
-    authCode: undefined,
-    authState: undefined
+    refreshToken: null,
+    accessToken: null,
+    userId: null,
+    error: null,
+    authCode: null,
+    authState: null
 };
 
 const userReducer = (state = INITIAL_STATE, action) => {

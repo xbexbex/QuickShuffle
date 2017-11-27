@@ -1,9 +1,7 @@
-import { connect } from 'react-redux';
-import axios from 'react-native-axios';
+import axios from 'axios';
 import * as ActionTypes from './ActionTypes';
 import queryString from 'query-string';
 
-axios.defaults.baseURL = 'https://accounts.spotify.com/api/token';
 const redirectUri = 'http://localhost:12345/sshuffle';
 const key = 'Basic ' + 'YjNiNzA1NTZiNjFiNDlhZDhjMGM2OGEyOTQ2YjJmZDg6MDg4MWJmZDRiYWE0NGM2NmI5YzhjMGY4NzZjYjNiMzU='
 const axiosConfig = {
@@ -13,54 +11,55 @@ const axiosConfig = {
     }
 };
 
-export function callUserService() {
-    return dispatch => {
-        dispatch(userResponsePending());
-        axios.get('https://jsonplaceholder.typicode.com/posts')
-        .then(response => {
-            dispatch(refreshTokenSuccess(response.data));
-        })
-        .catch(error => {
-            dispatch(userResponseError(error));
-        });
-    };
-}
-
 export function getAccessToken(refreshToken) {
     return dispatch => {
         dispatch(userResponsePending());
-        return axios.post('', {
+        return axios.post('https://accounts.spotify.com/api/token', queryString.stringify({
             grant_type: 'refresh_token',
             refresh_token: refreshToken
-        }, axiosConfig)
-        .then(response => {
-            dispatch(accessTokenSuccess(response.data));
-        })
-        .catch(error => {
-            dispatch(userResponseError(error));
-        });
+        }), axiosConfig)
+            .then(response => {
+                dispatch(accessTokenSuccess(response.data, 'accessTokenSuccess'));
+            })
+            .catch(error => {
+                console.log(error);
+                dispatch(userResponseError(error.response, 'accessTokenError'));
+            });
     };
 }
 
 export function getTokens(authCode) {
     return dispatch => {
-        if (!authCode) {
-            return dispatch(userResponseError('Authentication unsuccessful'));
-        }
-        dispatch(setAuthCode(authCode));
-        console.log(authCode);
         dispatch(userResponsePending());
-        return axios.post('', queryString.stringify({
+        return axios.post('https://accounts.spotify.com/api/token', queryString.stringify({
             grant_type: 'authorization_code',
             code: authCode,
             redirect_uri: redirectUri
         }), axiosConfig)
-        .then(response => {
-            dispatch(tokensSuccess(response.data));
-        })
-        .catch(error => {
-            dispatch(userResponseError(error, 'tokensError'));
-        });
+            .then(response => {
+                dispatch(tokensSuccess(response.data, 'tokensSuccess'));
+            })
+            .catch(error => {
+                dispatch(userResponseError(error.response, 'tokensError'));
+            });
+    };
+}
+
+export function getUserId(accessToken) {
+    console.log(accessToken);
+    return dispatch => {
+        const bear = 'Bearer ' + accessToken;
+        const axConfig = {
+            headers: { 'Authorization': bear }
+        };
+        dispatch(userResponsePending());
+        return axios.get('https://api.spotify.com/v1/me', axConfig)
+            .then(response => {
+                dispatch(userIdSuccess(response.data, 'userIdSuccess'));
+            })
+            .catch(error => {
+                dispatch(userResponseError(error.response, 'userIdError'));
+            });
     };
 }
 
@@ -69,7 +68,7 @@ export function setAuthCode(authCode, authState) {
         type: ActionTypes.SET_AUTH_CODE,
         authCode: authCode,
         authState: authState
-    }
+    };
 }
 
 export const userResponsePending = () => ({
@@ -91,12 +90,12 @@ export const tokensSuccess = (data, authState) => ({
 
 export const userIdSuccess = (data, authState) => ({
     type: ActionTypes.USER_ID_SUCCESS,
-    userId: data.refresh_token,
+    userId: data.id,
     authState: authState
 });
 
 export const accessTokenSuccess = (data, authState) => ({
-    type: ActionTypes.REFRESH_TOKEN_SUCCESS,
+    type: ActionTypes.ACCESS_TOKEN_SUCCESS,
     accessToken: data.access_token,
     authState: authState
 });

@@ -4,18 +4,20 @@ import { connect } from 'react-redux';
 import WebLogIn from '../components/WebLogIn';
 import styles from './styles/TestScreen';
 import icon from '../assets/images/icon.png';
-import { PlaylistList } from '../components/PlaylistList';
+import PlaylistList from '../components/PlaylistList';
 import { AntonText } from '../components/StyledText';
-import { LoadingScreen } from '../components/LoadingScreen';
+import LoadingScreen from '../components/LoadingScreen';
 import { STATUS_BAR_HEIGHT } from '../constants';
-import { getTokens } from '../actions/UserActions';
+import { getTokens, getAccessToken, getUserId } from '../actions/UserActions';
+import { getPlaylists } from '../actions/PlaylistsActions';
 
 function mapStateToProps(state) {
     return {
         authCode: state.userReducer.authCode,
-        accessToken: state.userReducer.accessToken, 
-        refreshToken: state.userReducer.refreshToken, 
-        error: state.userReducer.userError, 
+        accessToken: state.userReducer.accessToken,
+        userId: state.userReducer.userId,
+        refreshToken: state.userReducer.refreshToken,
+        error: state.userReducer.userError,
         authState: state.userReducer.authState
     };
 }
@@ -47,40 +49,56 @@ class TestScreen extends Component {
     }
 
     componentDidMount() {
-        console.log('abua');
-        console.log(this.props.error);
-        console.log('log:' + this.props.authCode);
-        console.log(this.props.refreshToken);
-        console.log(this.props.accessToken);
+        if (this.props.refreshToken !== null) {
+            this.props.dispatch(getAccessToken(this.props.refreshToken));
+        } else if (this.props.authCode !== null) {
+            this.props.dispatch(getTokens(this.props.authCode));
+        } else {
+            this.setState({ viewState: 'web' });
+        }
     }
 
     componentWillReceiveProps(props) {
-        if (props.authState !== this.props.authState) {
-            switch (props.authState) {
-                case 'authCodeSuccess':
-                    getTokens(props.authCode);
-                    this.setState({ viewState: 'loading' });
-                    break;
-                case 'tokensSuccess':
-                    this.setState({ viewState: 'playlists' });
-                    break;
-                case undefined:
-                    this.setState({ viewState: 'web' });
-                    break;
-                case 'webError':
-                    this.setState({ viewState: 'web' });
-                    break;
-                case 'refreshTokenError':
-                    this.setState({ viewState: 'web' });
-                    break;
-                default:
-                    this.setState({ viewState: 'playlists' });
-            }
+        if (props !== null && props.authState !== this.props.authState) {
+            this.checkProps(props);
         }
-        console.log(props.error);
-        console.log(props.authCode);
-        console.log(props.refreshToken);
-        console.log(props.accessToken);
+    }
+
+    checkProps(props) {
+        console.log(props.authState);
+        switch (props.authState) {
+            case 'authCodeSuccess':
+                this.props.dispatch(getTokens(props.authCode));
+                this.setState({ viewState: 'loading' });
+                break;
+            case 'tokensSuccess':
+                this.props.dispatch(getUserId(props.accessToken));
+                break;
+            case 'userIdSuccess':
+                this.setState({ viewState: 'playlists' });
+                break;
+            case 'accessTokenSuccess':
+                if (props.userId === null) {
+                    this.props.dispatch(getUserId(props.accessToken));
+                } else {
+                    this.setState({ viewState: 'playlists' });
+                }
+                break;
+            case null:
+                this.setState({ viewState: 'web' });
+                break;
+            case undefined:
+                this.setState({ viewState: 'web' });
+                break;
+            case 'webError':
+                this.setState({ viewState: 'web' });
+                break;
+            case 'refreshTokenError':
+                this.setState({ viewState: 'web' });
+                break;
+            default:
+                this.setState({ viewState: 'error' });
+        }
     }
 
     render() {
@@ -97,7 +115,7 @@ class TestScreen extends Component {
         }
         return (
             <Text>
-                Something went wrong
+               {this.props.error} 
             </Text>
         );
     }
