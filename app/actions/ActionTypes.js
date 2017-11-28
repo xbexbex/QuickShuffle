@@ -7,3 +7,6 @@ export const ACCESS_TOKEN_SUCCESS = 'access_token_success';
 export const USER_ID_SUCCESS = 'user_id_success';
 export const TOKENS_SUCCESS = 'tokens_success';
 export const SET_AUTH_CODE = 'set_auth_code';
+export const ADD_SELECTED_PLAYLIST = 'add_selected_playlist';
+export const REMOVE_SELECTED_PLAYLIST = 'remove_selected_playlist';
+export const REMOVE_PLAYLIST = 'remove_playlist';

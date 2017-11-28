@@ -24,6 +24,23 @@ export function getPlaylists(accessToken, userId) {
     };
 }
 
+export function getPlaylist(accessToken, userId, playlistId) {
+    const bear = 'Bearer ' + accessToken;
+    const axConfig = {
+        headers: { 'Authorization': bear }
+    };
+    const url = '/users/' + userId + '/playlists/' + playlistId;
+    return axios.get(url, axConfig)
+        .then(response => {
+            console.log(response.data);
+            dispatch(playlistsActionSuccess(response.data));
+        })
+        .catch(error => {
+            console.log(error.response);
+            dispatch(playlistsActionError(error));
+        });
+}
+
 export const playlistsActionPending = () => ({
     type: ActionTypes.PLAYLISTS_PENDING
 });
@@ -38,3 +55,17 @@ export const playlistsActionSuccess = (data) => ({
     playlists: data
 });
 
+export const addSelectedPlaylist = (data) => ({
+    type: ActionTypes.ADD_SELECTED_PLAYLIST,
+    playlistId: data
+});
+
+export const removeSelectedPlaylist = (data) => ({
+    type: ActionTypes.REMOVE_SELECTED_PLAYLIST,
+    playlistId: data
+});
+
+export const removePlaylist = (data) => ({
+    type: ActionTypes.REMOVE_PLAYLIST,
+    playlistId: data
+});
