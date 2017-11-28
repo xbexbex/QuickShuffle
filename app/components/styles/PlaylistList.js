@@ -19,11 +19,18 @@ const styles = EStyleSheet.create({
         paddingVertical: '2.5%'
     },
 
-    playlistItem: {
+    playlist: {
         height: 30,
         width: 175,
         marginVertical: '1.5%',
         backgroundColor: '$white'
+    },
+
+    playlistSelected: {
+        height: 30,
+        width: 175,
+        marginVertical: '1.5%',
+        backgroundColor: '$black'
     },
 
     playlistItemName: {

@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import { connect } from 'react-redux';
 import { PropTypes } from 'prop-types';
-import { View, Button } from 'react-native';
+import { View, Text, Button, ActivityIndicator, TouchableHighlight } from 'react-native';
 import { getPlaylist, addSelectedPlaylist, removeSelectedPlaylist, removePlaylist } from '../actions/PlaylistsActions';
 import styles from './styles/PlaylistList';
 
@@ -15,7 +15,7 @@ function mapStateToProps(state) {
 
 class PlaylistItem extends Component {
     static propTypes = {
-        playlist: PropTypes.string.isRequired,
+        playlist: PropTypes.object.isRequired,
 
     }
 
@@ -38,29 +38,30 @@ class PlaylistItem extends Component {
                 viewState: 'show'
             });
         } else {
-            this.props.dispatch(removePlaylist(playlist.id));
+            this.props.dispatch(removePlaylist(this.props.playlist.id));
         }
     }
 
-    onButtonPress = () => {
+    changeColor = () => {
         this.setState({ color: 'blue' });
     }
 
     render() {
         const { playlist, playlist: { id } } = this.props;
         return (
-            <View style={styles.playlistItem}>
-                <Button
-                    onPress={changeColor}
-                    title="Learn More"
-                    color="#841584"
-                    accessibilityLabel="Learn more about this purple button"
-                >
-                    {}
-                </Button>
-            </View >
+            <TouchableHighlight
+                onPress={this.changeColor}
+            >
+                <View style={styles.playlistItem}>
+                    <Text
+                        style={{ color: 'white' }}
+                    >
+                        {id}
+                    </Text>
+                </View >
+            </TouchableHighlight>
         );
     }
 }
 
-export default connect()(PlaylistItem);
+export default connect(mapStateToProps)(PlaylistItem);
