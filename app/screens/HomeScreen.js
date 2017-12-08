@@ -1,179 +1,130 @@
 import React, { Component } from 'react';
-import { View, Text, Button, KeyboardAvoidingView, WebView } from 'react-native';
-import { PlaylistApi } from '../../../api/data';
-import { AuthenticationApi } from '../../../api/authentication';
-import { LoadingScreen } from '../../commons';
-import { PlaylistList } from './components';
-import styles from './styles/HomeScreen';
+import { View, Text, Platform, Image, KeyboardAvoidingView } from 'react-native';
+import { connect } from 'react-redux';
+import WebLogIn from '../components/WebLogIn';
+import styles from './styles/TestScreen';
+import icon from '../assets/images/icon.png';
+import PlaylistList from '../components/PlaylistList';
+import { AntonText } from '../components/StyledText';
+import LoadingScreen from '../components/LoadingScreen';
+import { STATUS_BAR_HEIGHT } from '../constants';
+import { getTokens, getAccessToken, getUserId } from '../actions/UserActions';
+import { getPlaylists } from '../actions/PlaylistsActions';
 
-const playlistApi = new PlaylistApi();
-const authenticationApi = new AuthenticationApi();
-const webView = new WebView();
+function mapStateToProps(state) {
+    return {
+        authCode: state.userReducer.authCode,
+        accessToken: state.userReducer.accessToken,
+        userId: state.userReducer.userId,
+        refreshToken: state.userReducer.refreshToken,
+        error: state.userReducer.userError,
+        authState: state.userReducer.authState
+    };
+}
 
-export default class HomeScreen extends Component {
-    static defaultProps = {
-        playlistApi,
-        authenticationApi,
-        webView
+class TestScreen extends Component {
+
+    static navigationOption = () => ({
+        title: 'Playlists',
+        headerStyle: {
+            height: Platform.OS === 'android'
+                ? 54 + STATUS_BAR_HEIGHT
+                : 54,
+            backgroundColor: 'green'
+        },
+        headerTitleStyle: {
+            marginTop: Platform.OS === 'android'
+                ? STATUS_BAR_HEIGHT
+                : 0,
+            backgroundColor: 'red'
+        },
+        headerLeft: <Image source={icon} style={styles.imageStyle} />
+    });
+
+    constructor(props) {
+        super(props);
+        this.state = {
+            viewState: 'loading'
+        };
     }
 
-    state = {
-        loading: false,
-        manualAuth: false,
-        errors: 0,
-        authKey: null,
-        fetchErrorMessage: null,
-        fetching: false,
-        playlists: []
-    }
-
-    async returnFromWebView(key) {
-        if (key) {
-            this.setState({ loading: true,
-                manualAuth: false });
-            const accessToken = await this.props.authenticationApi.getTokens(key);
-            if (accessToken) {
-                this.setState({ 
-                    loading: false,
-                    authKey: accessToken
-                });
-                this.fetchPlaylists();
-            } else {
-                const errorPlus = this.state.errors + 1;
-                this.setState({
-                    loading: false,
-                    errors: errorPlus,
-                    manualAuth: true
-                });
-            }
+    componentDidMount() {
+        if (this.props.refreshToken !== null) {
+            this.props.dispatch(getAccessToken(this.props.refreshToken));
+        } else if (this.props.authCode !== null) {
+            this.props.dispatch(getTokens(this.props.authCode));
         } else {
-            this.setState({ manualAuth: true });
+            this.setState({ viewState: 'web' });
         }
     }
 
-    async componentDidMount() {
-        this.setState({ loading: true });
-        setTimeout(() => this.setState({ loading: false }), 2000);
-        this.checkIfValidKeys();
-    }
-
-    
-    async checkIfValidKeys() {
-        const response = await this.props.authenticationApi.checkIfValidKeyExists();
-        if (response) {
-            this.setState({
-                authKey: response,
-                errors: 0,
-                manualAuth: false
-            });
-        } else if (response == 1) {
-            const errorPlus = this.state.errors + 1;
-            this.setState({
-                errors: errorPlus,
-                manualAuth: true
-            });
-        } else {
-            this.setState({
-                authKey: null,
-                manualAuth: true
-            });
+    componentWillReceiveProps(props) {
+        if (props !== null && props.authState !== this.props.authState) {
+            this.checkProps(props);
         }
     }
 
-    async fetchPlaylists() {
-        this.setState({
-            fetching: true
-        });
-        const data = await this.props.playlistApi.fetchPlaylists(this.state.authKey);
-        if (data) {
-            this.setState({ 
-                errors: 0,
-                playlists: data.playlists,
-                fetchErrorMessage: null
-            });
-            return true;
-        } else {
-            const errorPlus = this.state.errors + 1;
-            this.setState({
-                fetchErrorMessage: 'Could not fetch playlists',
-                errors: errorPlus
-            });
-            return false;
+    checkProps(props) {
+        console.log(props.authState);
+        switch (props.authState) {
+            case 'authCodeSuccess':
+                this.props.dispatch(getTokens(props.authCode));
+                this.setState({ viewState: 'loading' });
+                break;
+            case 'tokensSuccess':
+                this.props.dispatch(getUserId(props.accessToken));
+                break;
+            case 'userIdSuccess':
+                this.setState({ viewState: 'playlists' });
+                break;
+            case 'accessTokenSuccess':
+                if (props.userId === null) {
+                    this.props.dispatch(getUserId(props.accessToken));
+                } else {
+                    this.setState({ viewState: 'playlists' });
+                }
+                break;
+            case null:
+                this.setState({ viewState: 'web' });
+                break;
+            case undefined:
+                this.setState({ viewState: 'web' });
+                break;
+            case 'webError':
+                this.setState({ viewState: 'web' });
+                break;
+            case 'refreshTokenError':
+                this.setState({ viewState: 'web' });
+                break;
+            default:
+                this.setState({ viewState: 'error' });
         }
-    }
-    
-    _onNavigationStateChange(e){
-        const url = e.url;
-        if (url.includes('sshuffle') && url.includes('code=')) {
-            let authCode;
-            if (url.includes('&')) {
-                authCode = url.substring(url.lastIndexOf("=") + 1, url.lastIndexOf('&'));
-            } else {
-                authCode = url.substring(url.lastIndexOf("=") + 1);
-            }
-            this.returnFromWebView(authCode);
-        } else if (url.includes('sshuffle')) {
-            this.returnFromWebView(null);
-        }
-        this.setState({
-            canGoBack: e.canGoBack
-        });
     }
 
     render() {
-        if (this.state.loading) {
-            return <LoadingScreen />;
-        } else if (this.state.manualAuth) {
+        if (this.state.viewState === 'web') {
             return (
-                <WebView
-                    ref={webview => { this.props.webView = webview; }}
-                    source={{uri: this.props.authenticationApi.getUrlForManualAuth()}}
-                    style={styles.webView}
-                    scalesPageToFit
-                    onNavigationStateChange={this._onNavigationStateChange.bind(this)}
-                    returnFromWebView={this.returnFromWebView}
-                    javaScriptEnabledAndroid
-                    backButtonEnabled
-                />
+                <KeyboardAvoidingView style={styles.container} behavior="padding">
+                    <WebLogIn />
+                </KeyboardAvoidingView>
             );
-        } else if (this.state.errors > 1) {
-            return (
-            <View style={styles.root}>
-                <View style={styles.topContainer}>
-                    <Text>Error connecting to Spotify</Text>
-                    <Button
-                        onPress={this.onRetryButtonPress}
-                        setParentState={newState=>this.setState(newState)}
-                        title="Try again"
-                        color="#841584"
-                        accessibilityLabel="Learn more about this purple button"
-                    />
-                </View>
-            </View>
-            )
-        } else {
-            return (
-                <View style={styles.root}>
-                    <View style={styles.topContainer}>
-                        <Text>QuickShuffle</Text>
-                        {!this.state.fetchErrorMessage ? 
-                            <Text>
-                                {this.state.fetchErrorMessage}
-                            </Text> 
-                        : null }
-                        <Button
-                            onPress={this.onRefreshButtonPress.bind(this)}
-                            fetchPlaylists={this.fetchPlaylists}
-                            title="Refresh playlists"
-                            color="#841584"
-                            accessibilityLabel="Learn more about this purple button"
-                        />
-                    </View>
-                    <View style={styles.bottomContainer}>
-                        <PlaylistList playlists={this.state.playlists} />
-                    </View>
-                </View>
-            );
+        } else if (this.state.viewState === 'playlists') {
+            return (<PlaylistList />);
+        } else if (this.state.viewState === 'loading') {
+            return (<LoadingScreen />);
         }
+        return (
+            <Text>
+               {this.props.error} 
+            </Text>
+        );
     }
 }
+
+export default connect(mapStateToProps)(TestScreen);
+
+/*<PlaylistItem
+post={post}
+onOpen={this.openMovie}
+key={index}
+/>)} */

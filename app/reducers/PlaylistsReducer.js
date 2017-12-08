@@ -9,33 +9,38 @@ const INITIAL_STATE = {
 
 const playlistsReducer = (state = INITIAL_STATE, action) => {
     switch (action.type) {
-        case Actions.ADD_SELECTED_PLAYLIST:
-            playlists = state.selectedPlaylists;
+        case Actions.ADD_SELECTED_PLAYLIST: {
+            const playlists = state.selectedPlaylists;
             playlists.push(action.playlistId);
             return Object.assign({}, state, {
                 selectedPlaylists: playlists
             });
-        case Actions.REMOVE_SELECTED_PLAYLIST:
-            const index = array.indexOf(action.playlistId);
-            playlists = state.selectedPlaylists;
+        }
+        case Actions.REMOVE_SELECTED_PLAYLIST: {
+            const playlists = state.selectedPlaylists;
+            const index = playlists.indexOf(action.playlistId);
             playlists.splice(index, 1);
             return Object.assign({}, state, {
                 selectedPlaylists: playlists
             });
-        case Actions.PLAYLISTS_PENDING:
+        }
+        case Actions.PLAYLISTS_PENDING: {
             return Object.assign({}, state, {
                 playlistsLoading: true
             });
-        case Actions.PLAYLISTS_ERROR:
+        }
+        case Actions.PLAYLISTS_ERROR: {
             return Object.assign({}, state, {
                 playlistsLoading: false,
                 playlistsError: action.error
             });
-        case Actions.PLAYLISTS_SUCCESS:
+        }
+        case Actions.PLAYLISTS_SUCCESS: {
             return Object.assign({}, state, {
                 playlistsLoading: false,
                 playlists: action.playlists
             });
+        }
         default:
             return state;
     }

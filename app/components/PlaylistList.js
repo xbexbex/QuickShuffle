@@ -47,7 +47,9 @@ class PlaylistList extends Component {
             );
         }
         return (
-            <ScrollView>
+            <ScrollView
+                contentContainerStyle={styles.root}
+            >
                 {this.props.playlists.map((playlist, i) => {
                     return (
                         <PlaylistItem

@@ -7,7 +7,7 @@ import { StackNavigator } from 'react-navigation';
 import { PersistGate } from 'redux-persist/es/integration/react';
 import EStyleSheet from 'react-native-extended-stylesheet';
 import Colors from './app/styling/Colors';
-import TestScreen from './app/screens/TestScreen';
+import HomeScreen from './app/screens/HomeScreen';
 import AboutScreen from './app/screens/AboutScreen';
 
 EStyleSheet.build(Colors);
@@ -19,7 +19,7 @@ export default class App extends React.Component {
     isLoadingComplete: false,
   };
 
-  _loadResourcesAsync = async () => {
+  loadResourcesAsync = async () => {
     store.dispatch({ type: 'GET_PLAYLISTS' });
     return Promise.all([
       Asset.loadAsync([
@@ -31,18 +31,18 @@ export default class App extends React.Component {
     ]);
   };
 
-  _handleLoadingError = error => {
+  handleLoadingError = error => {
     console.warn(error);
   };
 
-  _handleFinishLoading = () => {
+  handleFinishLoading = () => {
     this.setState({ isLoadingComplete: true });
   };
   
   render() {
     const MainNavigator = StackNavigator({
       Main: {
-        screen: TestScreen
+        screen: HomeScreen
       },
       About: {
         screen: AboutScreen
@@ -52,9 +52,9 @@ export default class App extends React.Component {
     if (!this.state.isLoadingComplete && !this.props.skipLoadingScreen) {
       return (
         <AppLoading
-          startAsync={this._loadResourcesAsync}
-          onError={this._handleLoadingError}
-          onFinish={this._handleFinishLoading}
+          startAsync={this.loadResourcesAsync}
+          onError={this.handleLoadingError}
+          onFinish={this.handleFinishLoading}
         />
       );
     }

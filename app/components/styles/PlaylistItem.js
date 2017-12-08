@@ -4,14 +4,17 @@ import { Dimensions } from 'react-native';
 const SCREEN_WIDTH = Dimensions.get('window').width;
 
 const styles = EStyleSheet.create({
-    root: {
-        flex: 1,
-        justifyContent: 'center',
-        alignItems: 'center',
-        backgroundColor: '$white'
+    default: {
+        height: 30,
+        width: SCREEN_WIDTH * 0.9,
+        marginVertical: '1.5%',
+        backgroundColor: 'gray'
     },
-    playlistItem: {
-        width: SCREEN_WIDTH * 0.9
+    selected: {
+        height: 30,
+        width: SCREEN_WIDTH * 0.9,
+        marginVertical: '1.5%',
+        backgroundColor: 'red'
     }
 });
 

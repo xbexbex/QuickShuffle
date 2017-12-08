@@ -14,31 +14,31 @@ export function getPlaylists(accessToken, userId) {
         const url = '/users/' + userId + '/playlists';
         return axios.get(url, axConfig)
             .then(response => {
-                console.log(response);
                 dispatch(playlistsActionSuccess(response.data.items));
             })
             .catch(error => {
-                console.log(error.response);
                 dispatch(playlistsActionError(error));
             });
     };
 }
 
 export function getPlaylist(accessToken, userId, playlistId) {
-    const bear = 'Bearer ' + accessToken;
-    const axConfig = {
-        headers: { 'Authorization': bear }
+    return dispatch => {
+        const bear = 'Bearer ' + accessToken;
+        const axConfig = {
+            headers: { 'Authorization': bear }
+        };
+        const url = '/users/' + userId + '/playlists/' + playlistId;
+        return axios.get(url, axConfig)
+            .then(response => {
+                console.log(response.data);
+                dispatch(playlistsActionSuccess(response.data));
+            })
+            .catch(error => {
+                console.log(error.response);
+                dispatch(playlistsActionError(error));
+            });
     };
-    const url = '/users/' + userId + '/playlists/' + playlistId;
-    return axios.get(url, axConfig)
-        .then(response => {
-            console.log(response.data);
-            dispatch(playlistsActionSuccess(response.data));
-        })
-        .catch(error => {
-            console.log(error.response);
-            dispatch(playlistsActionError(error));
-        });
 }
 
 export const playlistsActionPending = () => ({

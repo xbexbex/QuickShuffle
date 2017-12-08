@@ -1,9 +1,9 @@
 import React, { Component } from 'react';
 import { connect } from 'react-redux';
 import { PropTypes } from 'prop-types';
-import { View, Text, Button, ActivityIndicator, TouchableHighlight } from 'react-native';
+import { View, Text, ActivityIndicator, TouchableOpacity } from 'react-native';
 import { getPlaylist, addSelectedPlaylist, removeSelectedPlaylist, removePlaylist } from '../actions/PlaylistsActions';
-import styles from './styles/PlaylistList';
+import styles from './styles/PlaylistItem';
 
 function mapStateToProps(state) {
     return {
@@ -16,14 +16,13 @@ function mapStateToProps(state) {
 class PlaylistItem extends Component {
     static propTypes = {
         playlist: PropTypes.object.isRequired,
-
     }
 
     constructor(props) {
         super(props);
         this.state = {
-            viewState: 'loading',
-            color: 'white'
+            loading: true,
+            isSelected: false
         };
     }
 
@@ -32,7 +31,7 @@ class PlaylistItem extends Component {
     }
 
     async getPlaylist() {
-        playlist = getPlaylist(this.props.accessToken, this.props.userId, this.props.playlist.id);
+        const playlist = getPlaylist(this.props.accessToken, this.props.userId, this.props.playlist.id);
         if (playlist !== null) {
             this.setState({
                 viewState: 'show'
@@ -42,24 +41,49 @@ class PlaylistItem extends Component {
         }
     }
 
-    changeColor = () => {
-        this.setState({ color: 'blue' });
+    onPress = () => {
+        if (this.state.isSelected) {
+            this.setState({
+                isSelected: false
+            });
+            this.props.dispatch(removeSelectedPlaylist(this.props.playlist));
+        } else {
+            this.setState({
+                isSelected: true
+            });
+            this.props.dispatch(addSelectedPlaylist(this.props.playlist));
+        }
     }
 
     render() {
         const { playlist, playlist: { id } } = this.props;
+        if (this.state.isSelected) {
+            return (
+                <TouchableOpacity
+                    onPress={this.onPress}
+                >
+                    <View style={styles.selected}>
+                        <Text
+                            style={styles.selectedText}
+                        >
+                            {id}
+                        </Text>
+                    </View >
+                </TouchableOpacity>
+            );
+        }
         return (
-            <TouchableHighlight
-                onPress={this.changeColor}
+            <TouchableOpacity
+                onPress={this.onPress}
             >
-                <View style={styles.playlistItem}>
+                <View style={styles.default}>
                     <Text
-                        style={{ color: 'white' }}
+                        style={styles.defaultText}
                     >
                         {id}
                     </Text>
                 </View >
-            </TouchableHighlight>
+            </TouchableOpacity>
         );
     }
 }
