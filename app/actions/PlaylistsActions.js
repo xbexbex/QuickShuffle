@@ -41,6 +41,113 @@ export function getPlaylist(accessToken, userId, playlistId) {
     };
 }
 
+function changePlaylistName(accessToken, userId, playlistId, playlistName) {
+    const bear = 'Bearer ' + accessToken;
+    const axConfig = {
+        headers: {
+            'Authorization': bear,
+            'Content-Type': 'application/json'
+        }
+    };
+    const url = '/users/' + userId + '/playlists/' + playlistId;
+    return axios.put(url, axConfig, {
+        name: playlistName
+    })
+        .then(response => {
+            return true;
+        })
+        .catch(error => {
+            console.log(error.response);
+            return false;
+        });
+}
+
+function createPlaylist(accessToken, userId, playlistName, playlistData) {
+    const bear = 'Bearer ' + accessToken;
+    const axConfig = {
+        headers: {
+            'Authorization': bear,
+            'Content-Type': 'application/json'
+        }
+    };
+    const url = '/users/' + userId + '/playlists';
+    return axios.post(url, axConfig, {
+        name: playlistName,
+        public: false
+    })
+        .then(response => {
+            return true;
+        })
+        .catch(error => {
+            console.log(error.response);
+            return false;
+        });
+}
+
+function removeSongsFromPlaylist(accessToken, userId, playlistId, playlistTrackPositions, playlistSnapshotId) {
+    const bear = 'Bearer ' + accessToken;
+    const axConfig = {
+        headers: {
+            'Authorization': bear,
+            'Content-Type': 'application/json'
+        }
+    };
+    const url = '/users/' + userId + '/playlists/' + playlistId + '/tracks';
+    return axios.post(url, axConfig, {
+        positions: playlistTrackPositions,
+        snapshot_id: playlistSnapshotId
+    })
+        .then(response => {
+            return true;
+        })
+        .catch(error => {
+            console.log(error.response);
+            return false;
+        });
+}
+
+function addSongsToPlaylist(accessToken, userId, playlistId, playlistUris, insertPosition) {
+    const bear = 'Bearer ' + accessToken;
+    const axConfig = {
+        headers: {
+            'Authorization': bear,
+            'Content-Type': 'application/json'
+        }
+    };
+    const url = '/users/' + userId + '/playlists/' + playlistId + '/tracks';
+    return axios.post(url, axConfig, {
+        uris: playlistUris,
+        position: inserPosition
+    })
+        .then(response => {
+            return true;
+        })
+        .catch(error => {
+            console.log(error.response);
+            return false;
+        });
+}
+
+function shufflePlaylist(accessToken, userId, playlistId) {
+    const playlist = getPlaylist(accessToken, userId, playlistId);
+    const trackStuff =
+}
+
+export function ShufflePlaylists(accessToken, userId, playlists) {
+    return dispatch => {
+        dispatch(playlistsActionPending);
+        try {
+            playlists.map((playlist) => {
+                shufflePlaylist(accessToken, userId, playlist.id)
+            });
+            return dispatch(playlistsActionSuccess);
+        } catch (error) {
+            return dispatch(playlistsActionError);
+        }
+    }
+
+}
+
 export const playlistsActionPending = () => ({
     type: ActionTypes.PLAYLISTS_PENDING
 });
