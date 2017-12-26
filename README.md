@@ -9,5 +9,5 @@ A simple spotify playlist randomizer app for mobile devices.
 4. In spotify, when ordered by date added, the playlist's song order is now shuffled
 
 ## Development
-1. Clone the github and run npm install
+1. Clone the repository and run npm install
 2. (Optional) Install Expo and a mobile device emulator of your choice (Android Studio, Genymotion, etc). Open the project folder in Expo while your emulator is running to quickly view changes.
